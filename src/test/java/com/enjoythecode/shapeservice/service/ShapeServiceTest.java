@@ -151,12 +151,15 @@ class ShapeServiceTest {
     public void shouldWriteShapesToFileWhenExportToJson() {
         //given
         String testFilePath = "test.json";
+        File testFile = new File(testFilePath);
+
+        //check if the file does not exist
+        assertFalse(testFile.exists());
 
         //when
         shapeService.exportShapesToJson(shapeListForTest, testFilePath);
 
         //then
-        File testFile = new File(testFilePath);
         assertTrue(testFile.exists());
 
         //cleanup
@@ -167,6 +170,10 @@ class ShapeServiceTest {
     public void shouldReadShapesFromFileWhenImportFromJson() {
         //given
         String testFilePath = "test.json";
+        File testFile = new File(testFilePath);
+
+        //check if the file does not exist before writing
+        assertFalse(testFile.exists());
         shapeService.exportShapesToJson(shapeListForTest, testFilePath);
 
         //when
