@@ -18,12 +18,12 @@ public class Square extends Shape {
 
     @Override
     public double calculateArea() {
-        return 0;
+        return side * side;
     }
 
     @Override
     public double calculatePerimeter() {
-        return 0;
+        return 4 * side;
     }
 
 }
