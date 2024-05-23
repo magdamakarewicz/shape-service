@@ -33,8 +33,11 @@ public class Main {
         shapeList.forEach(System.out::println);
 
         try {
-            // Find and print the shape with the largest area
+            //Find and print the shape with the largest area
             System.out.println("Shape with largest area = " + shapeService.findShapeWithLargestArea(shapeList));
+            //Find and print the shape with the largest perimeter of type Rectangle
+            System.out.println("Shape with largest perimeter (Rectangle) = "
+                    + shapeService.findShapeWithLargestPerimeterByType(shapeList, Rectangle.class));
         } catch (ShapeNotFoundException e) {
             e.printStackTrace();
         }

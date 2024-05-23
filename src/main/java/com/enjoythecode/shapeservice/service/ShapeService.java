@@ -16,4 +16,15 @@ public class ShapeService {
                 .orElseThrow(() -> new ShapeNotFoundException("No shape found"));
     }
 
+    public Shape findShapeWithLargestPerimeterByType(List<Shape> shapes, Class<? extends Shape> shapeType)
+            throws ShapeNotFoundException {
+        return Optional.ofNullable(shapes)
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(x -> x.getClass() == shapeType)
+                .max(Comparator.comparingDouble(Shape::calculatePerimeter))
+                .orElseThrow(() -> new ShapeNotFoundException("No shape found"));
+    }
+
 }
