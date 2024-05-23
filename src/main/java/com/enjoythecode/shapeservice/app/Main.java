@@ -1,6 +1,7 @@
 package com.enjoythecode.shapeservice.app;
 
 import com.enjoythecode.shapeservice.exception.ShapeNotFoundException;
+import com.enjoythecode.shapeservice.exception.ShapeServiceException;
 import com.enjoythecode.shapeservice.model.*;
 import com.enjoythecode.shapeservice.service.ShapeService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -48,9 +49,9 @@ public class Main {
             e.printStackTrace();
         }
 
+        try {
         //Export the list of shapes to JSON
         shapeService.exportShapesToJson(shapeList, "src/main/resources/shapelist.json");
-
         //Import shapes from the JSON file
         List<Shape> importedShapeList = shapeService.importShapesFromJson("src/main/resources/shapelist.json");
         //Print all imported shapes from the list
@@ -58,6 +59,10 @@ public class Main {
 
         //Verify that the original list and the imported list are the same
         System.out.println("(shapeList.equals(importedShapeList)) = " + (shapeList.equals(importedShapeList)));
+        } catch (ShapeServiceException e) {
+            e.printStackTrace();
+        }
+
 
     }
 }

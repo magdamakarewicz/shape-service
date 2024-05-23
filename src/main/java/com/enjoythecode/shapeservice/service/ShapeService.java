@@ -1,6 +1,7 @@
 package com.enjoythecode.shapeservice.service;
 
 import com.enjoythecode.shapeservice.exception.ShapeNotFoundException;
+import com.enjoythecode.shapeservice.exception.ShapeServiceException;
 import com.enjoythecode.shapeservice.model.Shape;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,26 +39,25 @@ public class ShapeService {
                 .orElseThrow(() -> new ShapeNotFoundException("No shape found"));
     }
 
-    public void exportShapesToJson(List<Shape> shapes, String filePath) {
+    public void exportShapesToJson(List<Shape> shapes, String filePath) throws ShapeServiceException {
         try (
                 FileWriter fileWriter = new FileWriter(filePath)
         ) {
             objectMapper.writeValue(fileWriter, shapes);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ShapeServiceException("Failed to export shapes to JSON", e);
         }
     }
 
-    public List<Shape> importShapesFromJson(String filePath) {
+    public List<Shape> importShapesFromJson(String filePath) throws ShapeServiceException {
         try (
                 FileReader fileReader = new FileReader(filePath)
         ) {
             return objectMapper.readValue(fileReader, new TypeReference<List<Shape>>() {
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ShapeServiceException("Failed to import shapes from JSON", e);
         }
-        return new ArrayList<>();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.enjoythecode.shapeservice.service;
 
 import com.enjoythecode.shapeservice.exception.ShapeNotFoundException;
+import com.enjoythecode.shapeservice.exception.ShapeServiceException;
 import com.enjoythecode.shapeservice.model.Circle;
 import com.enjoythecode.shapeservice.model.Rectangle;
 import com.enjoythecode.shapeservice.model.Shape;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,7 +150,7 @@ class ShapeServiceTest {
     }
 
     @Test
-    public void shouldWriteShapesToFileWhenExportToJson() {
+    public void shouldWriteShapesToFileWhenExportToJson() throws ShapeServiceException {
         //given
         String testFilePath = "test.json";
         File testFile = new File(testFilePath);
@@ -167,7 +169,7 @@ class ShapeServiceTest {
     }
 
     @Test
-    public void shouldReadShapesFromFileWhenImportFromJson() {
+    public void shouldReadShapesFromFileWhenImportFromJson() throws ShapeServiceException {
         //given
         String testFilePath = "test.json";
         File testFile = new File(testFilePath);
@@ -185,6 +187,40 @@ class ShapeServiceTest {
         //cleanup
         File file = new File(testFilePath);
         file.delete();
+    }
+
+    @Test
+    public void shouldThrowShapeServiceExceptionWhenInvalidFilePathAndExportFails() {
+        //given
+        String invalidFilePath = "/invalid/path/test.json";
+
+        //when
+        Exception e = assertThrows(ShapeServiceException.class,
+                () -> shapeService.exportShapesToJson(shapeListForTest, invalidFilePath));
+
+        //then
+        SoftAssertions sa = new SoftAssertions();
+        sa.assertThat(e).isExactlyInstanceOf(ShapeServiceException.class);
+        sa.assertThat(e).hasMessage("Failed to export shapes to JSON");
+        sa.assertThat(e.getCause()).isInstanceOf(IOException.class);
+        sa.assertAll();
+    }
+
+    @Test
+    public void shouldThrowShapeServiceExceptionWhenFileNotFoundAndImportFails() {
+        //given
+        String nonExistentFilePath = "nonexistentfile.json";
+
+        //when
+        Exception e = assertThrows(ShapeServiceException.class,
+                () -> shapeService.importShapesFromJson(nonExistentFilePath));
+
+        //then
+        SoftAssertions sa = new SoftAssertions();
+        sa.assertThat(e).isExactlyInstanceOf(ShapeServiceException.class);
+        sa.assertThat(e).hasMessage("Failed to import shapes from JSON");
+        sa.assertThat(e.getCause()).isInstanceOf(IOException.class);
+        sa.assertAll();
     }
 
 }
