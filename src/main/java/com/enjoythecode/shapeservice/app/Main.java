@@ -3,6 +3,8 @@ package com.enjoythecode.shapeservice.app;
 import com.enjoythecode.shapeservice.exception.ShapeNotFoundException;
 import com.enjoythecode.shapeservice.model.*;
 import com.enjoythecode.shapeservice.service.ShapeService;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -12,8 +14,12 @@ public class Main {
         //Initialize the ShapeFactory
         ShapeFactory shapeFactory = new ShapeFactory();
 
-        // Initialize the ShapeService
-        ShapeService shapeService = new ShapeService();
+        // Configure ObjectMapper for JSON processing
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // Initialize the ShapeService with the configured ObjectMapper
+        ShapeService shapeService = new ShapeService(objectMapper);
 
         //Create shapes using the ShapeFactory
         Square sq1 = shapeFactory.createSquare(10);
@@ -41,6 +47,17 @@ public class Main {
         } catch (ShapeNotFoundException e) {
             e.printStackTrace();
         }
+
+        //Export the list of shapes to JSON
+        shapeService.exportShapesToJson(shapeList, "src/main/resources/shapelist.json");
+
+        //Import shapes from the JSON file
+        List<Shape> importedShapeList = shapeService.importShapesFromJson("src/main/resources/shapelist.json");
+        //Print all imported shapes from the list
+        importedShapeList.forEach(System.out::println);
+
+        //Verify that the original list and the imported list are the same
+        System.out.println("(shapeList.equals(importedShapeList)) = " + (shapeList.equals(importedShapeList)));
 
     }
 }
