@@ -5,26 +5,32 @@ import com.enjoythecode.shapeservice.model.Circle;
 import com.enjoythecode.shapeservice.model.Rectangle;
 import com.enjoythecode.shapeservice.model.Shape;
 import com.enjoythecode.shapeservice.model.ShapeFactory;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ShapeServiceTest {
 
     ShapeFactory shapeFactory;
+    ObjectMapper objectMapper;
     ShapeService shapeService;
     List<Shape> shapeListForTest;
 
     @BeforeEach
     public void init() {
         shapeFactory = new ShapeFactory();
-        shapeService = new ShapeService();
+
+        objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        shapeService = new ShapeService(objectMapper);
 
         shapeListForTest = new ArrayList<>();
         shapeListForTest.add(shapeFactory.createSquare(2));
@@ -139,6 +145,39 @@ class ShapeServiceTest {
         sa.assertThat(e).hasMessage("No shape found");
         sa.assertThat(e).hasNoCause();
         sa.assertAll();
+    }
+
+    @Test
+    public void shouldWriteShapesToFileWhenExportToJson() {
+        //given
+        String testFilePath = "test.json";
+
+        //when
+        shapeService.exportShapesToJson(shapeListForTest, testFilePath);
+
+        //then
+        File testFile = new File(testFilePath);
+        assertTrue(testFile.exists());
+
+        //cleanup
+        testFile.delete();
+    }
+
+    @Test
+    public void shouldReadShapesFromFileWhenImportFromJson() {
+        //given
+        String testFilePath = "test.json";
+        shapeService.exportShapesToJson(shapeListForTest, testFilePath);
+
+        //when
+        List<Shape> actualShapes = shapeService.importShapesFromJson(testFilePath);
+
+        //then
+        assertTrue(shapeListForTest.equals(actualShapes));
+
+        //cleanup
+        File file = new File(testFilePath);
+        file.delete();
     }
 
 }
